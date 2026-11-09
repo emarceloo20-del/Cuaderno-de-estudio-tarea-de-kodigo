@@ -1,10 +1,10 @@
-# Cuaderno · Planificador de estudio
+﻿# Cuaderno · Planificador de estudio
 
 Aplicación web hecha con **Next.js 16 (App Router) y TypeScript** para organizar el estudio universitario: materias con sus temas y horas sugeridas, un tablero de tareas y un temporizador Pomodoro.
 
 Proyecto de la actividad evaluada *Implementación de Aplicación Next.js mediante Vibe Coding*.
 
-- **Despliegue:** `https://TU-APP.vercel.app` ← reemplaza con tu URL de Vercel
+- **Despliegue:** `https://cuaderno-de-estudio-tarea-de-kodigo.vercel.app`
 - **Proceso con IA:** ver [`VIBE_CODING.md`](./VIBE_CODING.md)
 
 ## Rutas
@@ -32,8 +32,8 @@ Proyecto de la actividad evaluada *Implementación de Aplicación Next.js median
 ## Instalación y uso
 
 ```bash
-git clone https://github.com/TU-USUARIO/cuaderno.git
-cd cuaderno
+git clone https://github.com/emarceloo20-del/Cuaderno-de-estudio-tarea-de-kodigo.git
+cd Cuaderno-de-estudio-tarea-de-kodigo
 npm install
 cp .env.example .env.local
 npm run dev
@@ -67,3 +67,4 @@ src/
   components/     Navbar, TaskBoard, PomodoroTimer, etc.
   lib/            datos (data.ts) y helper para llamar a la API (api.ts)
 ```
+
