@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --papel: #eef3f7;
+  --cuadricula: #d3dfe8;
+  --hoja: #ffffff;
+  --tinta: #1b2a6b;
+  --grafito: #2a2f38;
+  --margen: #d64550;
+  --resaltador: #ffe14d;
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-papel: var(--papel);
+  --color-hoja: var(--hoja);
+  --color-tinta: var(--tinta);
+  --color-grafito: var(--grafito);
+  --color-margen: var(--margen);
+  --color-resaltador: var(--resaltador);
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--papel);
+  background-image:
+    linear-gradient(var(--cuadricula) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cuadricula) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--grafito);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* Hoja rayada con línea de margen roja: el elemento memorable de la interfaz */
+.hoja {
+  position: relative;
+  background-color: var(--hoja);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    #dbe6ee 31px,
+    #dbe6ee 32px
+  );
+  border: 1px solid #c3d2de;
+  border-radius: 3px;
+  box-shadow: 3px 4px 0 #c3d2de;
+}
+.hoja::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 2.75rem;
+  width: 2px;
+  background: var(--margen);
+  opacity: 0.55;
+}
+
+.marca {
+  background-image: linear-gradient(transparent 55%, var(--resaltador) 55%, var(--resaltador) 92%, transparent 92%);
+}
+
+:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
