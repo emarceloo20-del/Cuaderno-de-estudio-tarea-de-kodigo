@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className="h-full antialiased">
+    <html lang="es" className="h-full antialiased" data-scroll-behavior="smooth">
       <body className="relative flex min-h-full flex-col">
         <Navbar />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 md:py-12">
