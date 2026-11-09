@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cuaderno · Planificador de estudio
 
-## Getting Started
+Aplicación web hecha con **Next.js 16 (App Router) y TypeScript** para organizar el estudio universitario: materias con sus temas y horas sugeridas, un tablero de tareas y un temporizador Pomodoro.
 
-First, run the development server:
+Proyecto de la actividad evaluada *Implementación de Aplicación Next.js mediante Vibe Coding*.
+
+- **Despliegue:** `https://TU-APP.vercel.app` ← reemplaza con tu URL de Vercel
+- **Proceso con IA:** ver [`VIBE_CODING.md`](./VIBE_CODING.md)
+
+## Rutas
+
+| Ruta | Tipo | Qué hace |
+| --- | --- | --- |
+| `/` | Server Component | Inicio: nota del día y carga semanal (consume la API interna) |
+| `/materias` | Server Component | Listado con búsqueda (`?q=`), con `loading.tsx` y `error.tsx` |
+| `/materias/[id]` | Server Component | Detalle de una materia; `not-found.tsx` si no existe |
+| `/tareas` | Server + Client | Tablero de tareas con `useState`/`useEffect` (se guarda en el navegador) |
+| `/pomodoro` | Server + Client | Temporizador de bloques de foco y descanso |
+| `/acerca` | Server Component | Stack y rutas de la API |
+
+### Route Handlers
+
+- `GET /api/materias` — lista de materias (acepta `?q=`, sin distinguir acentos)
+- `GET /api/materias/[id]` — detalle (404 si no existe)
+- `GET /api/frase` — nota de estudio al azar
+
+## Requisitos
+
+- Node.js 20.9 o superior
+- npm
+
+## Instalación y uso
 
 ```bash
+git clone https://github.com/TU-USUARIO/cuaderno.git
+cd cuaderno
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Otros comandos:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint    # ESLint
+npm run build   # build de producción
+npm run start   # servir el build
+```
 
-## Learn More
+## Variables de entorno
 
-To learn more about Next.js, take a look at the following resources:
+Ver `.env.example`. La app **no necesita claves** para funcionar; `NEXT_PUBLIC_SITE_URL` es opcional. Las claves reales van siempre en `.env.local`, que está en `.gitignore`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Despliegue en Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Sube el repositorio a GitHub.
+2. En [vercel.com/new](https://vercel.com/new) importa el repositorio (Vercel detecta Next.js solo).
+3. Pulsa **Deploy** y pega la URL resultante en este README.
 
-## Deploy on Vercel
+## Estructura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/            rutas, layouts y Route Handlers (api/)
+  components/     Navbar, TaskBoard, PomodoroTimer, etc.
+  lib/            datos (data.ts) y helper para llamar a la API (api.ts)
+```

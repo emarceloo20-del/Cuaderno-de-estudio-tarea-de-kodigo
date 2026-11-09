@@ -71,14 +71,20 @@ export const frases: string[] = [
   "Divide la tarea hasta que el primer paso dure menos de diez minutos.",
 ];
 
+const normalizar = (texto: string) =>
+  texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
 export function buscarMaterias(q?: string | null): Materia[] {
-  if (!q) return materias;
-  const t = q.trim().toLowerCase();
+  const t = normalizar(q ?? "");
   if (!t) return materias;
   return materias.filter(
     (m) =>
-      m.nombre.toLowerCase().includes(t) ||
-      m.temas.some((x) => x.toLowerCase().includes(t)),
+      normalizar(m.nombre).includes(t) ||
+      m.temas.some((x) => normalizar(x).includes(t)),
   );
 }
 

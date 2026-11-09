@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Materia } from "@/lib/data";
 
 type Tarea = {
@@ -15,13 +15,51 @@ type Filtro = "todas" | "pendientes" | "hechas";
 
 const CLAVE = "cuaderno:tareas";
 
+// Pequeño almacén sobre localStorage: evita desajustes de hidratación
+// (el servidor devuelve null y el cliente lee lo guardado).
+const oyentes = new Set<() => void>();
+
+function suscribir(cb: () => void) {
+  oyentes.add(cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    oyentes.delete(cb);
+    window.removeEventListener("storage", cb);
+  };
+}
+
+function leerGuardado(): string {
+  try {
+    return localStorage.getItem(CLAVE) ?? "[]";
+  } catch {
+    return "[]";
+  }
+}
+
+function guardar(tareas: Tarea[]) {
+  try {
+    localStorage.setItem(CLAVE, JSON.stringify(tareas));
+  } catch {
+    /* almacenamiento lleno o bloqueado: la lista queda solo en pantalla */
+  }
+  oyentes.forEach((cb) => cb());
+}
+
 export default function TaskBoard({ materiaInicial }: { materiaInicial?: string }) {
   const [materias, setMaterias] = useState<Materia[]>([]);
   const [cargandoMaterias, setCargandoMaterias] = useState(true);
   const [errorMaterias, setErrorMaterias] = useState<string | null>(null);
 
-  const [tareas, setTareas] = useState<Tarea[]>([]);
-  const [listo, setListo] = useState(false);
+  const guardado = useSyncExternalStore(suscribir, leerGuardado, () => null);
+  const listo = guardado !== null;
+  const tareas = useMemo<Tarea[]>(() => {
+    if (!guardado) return [];
+    try {
+      return JSON.parse(guardado) as Tarea[];
+    } catch {
+      return [];
+    }
+  }, [guardado]);
 
   const [texto, setTexto] = useState("");
   const [materiaId, setMateriaId] = useState(materiaInicial ?? "");
@@ -48,27 +86,6 @@ export default function TaskBoard({ materiaInicial }: { materiaInicial?: string 
     return () => ctrl.abort();
   }, [materiaInicial]);
 
-  // Leer tareas guardadas (solo en el cliente, después de hidratar)
-  useEffect(() => {
-    try {
-      const guardado = localStorage.getItem(CLAVE);
-      if (guardado) setTareas(JSON.parse(guardado) as Tarea[]);
-    } catch {
-      /* si el almacenamiento falla, se empieza con la lista vacía */
-    }
-    setListo(true);
-  }, []);
-
-  // Guardar cada cambio
-  useEffect(() => {
-    if (!listo) return;
-    try {
-      localStorage.setItem(CLAVE, JSON.stringify(tareas));
-    } catch {
-      /* almacenamiento lleno o bloqueado */
-    }
-  }, [tareas, listo]);
-
   const nombreMateria = (id: string) =>
     materias.find((m) => m.id === id)?.nombre ?? "Sin materia";
   const colorMateria = (id: string) =>
@@ -78,18 +95,18 @@ export default function TaskBoard({ materiaInicial }: { materiaInicial?: string 
     e.preventDefault();
     const limpio = texto.trim();
     if (!limpio) return;
-    setTareas((prev) => [
+    guardar([
       { id: crypto.randomUUID(), texto: limpio, materiaId, fecha, hecha: false },
-      ...prev,
+      ...tareas,
     ]);
     setTexto("");
     setFecha("");
   }
 
   const alternar = (id: string) =>
-    setTareas((prev) => prev.map((t) => (t.id === id ? { ...t, hecha: !t.hecha } : t)));
-  const eliminar = (id: string) => setTareas((prev) => prev.filter((t) => t.id !== id));
-  const limpiarHechas = () => setTareas((prev) => prev.filter((t) => !t.hecha));
+    guardar(tareas.map((t) => (t.id === id ? { ...t, hecha: !t.hecha } : t)));
+  const eliminar = (id: string) => guardar(tareas.filter((t) => t.id !== id));
+  const limpiarHechas = () => guardar(tareas.filter((t) => !t.hecha));
 
   const visibles = tareas.filter((t) =>
     filtro === "todas" ? true : filtro === "hechas" ? t.hecha : !t.hecha,
